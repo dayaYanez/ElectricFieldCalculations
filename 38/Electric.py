@@ -4,7 +4,7 @@ from pathlib import Path
 from MDAnalysis.analysis import distances
 
 DISTANCE_CUTOFF = 37.794519772  # 20A in Bohr
-TIP4P_O_CHARGE = -1.04
+O_CHARGE = -1.04
 HW_CHARGE = 0.52
 
 
@@ -53,7 +53,7 @@ def main():
         hw2_positions = frame[frame["atomname"] == "HW2"][["x", "y", "z"]].values
 
         water_coords = [
-            (ow_positions, TIP4P_O_CHARGE),
+            (ow_positions, O_CHARGE),
             (hw1_positions, HW_CHARGE),
             (hw2_positions, HW_CHARGE),
         ]
