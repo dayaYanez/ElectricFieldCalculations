@@ -1,0 +1,4 @@
+/home/dayalyz/.local/lib/python3.9/site-packages/MDAnalysis/coordinates/XDR.py:240: UserWarning: Reload offsets from trajectory
+ ctime or size or n_atoms did not match
+  warnings.warn("Reload offsets from trajectory\n "
+ Saved with atom identity and Bohr coordinates in 'bohrIndxTimestep.txt'
