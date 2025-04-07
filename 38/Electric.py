@@ -4,7 +4,7 @@ from pathlib import Path
 from MDAnalysis.analysis import distances
 
 DISTANCE_CUTOFF = 37.794519772  # 20Å in Bohr
-MO_CHARGE = -1.04
+O_CHARGE = -1.04
 HW_CHARGE = 0.52
 
 
@@ -24,7 +24,7 @@ def compute_electric_field(ni_pos, water_molecules):
     for ow, mw, hw1, hw2 in water_molecules:
         dist_ow = np.linalg.norm(ow - ni_pos)
         if dist_ow < DISTANCE_CUTOFF:
-            for pos, charge in zip([mw, hw1, hw2], [MO_CHARGE, HW_CHARGE, HW_CHARGE]):
+            for pos, charge in zip([mw, hw1, hw2], [O_CHARGE, HW_CHARGE, HW_CHARGE]):
                 r_vec = pos - ni_pos
                 r = np.linalg.norm(r_vec)
                 if r != 0:
@@ -33,22 +33,20 @@ def compute_electric_field(ni_pos, water_molecules):
     return ei_vector
 
 
-def compute_bisector(n2, n3, n4):
-    v1 = unit_vector(n3 - n2)
-    v2 = unit_vector(n4 - n2)
+def compute_bisector(n_center, n1, n2):
+    v1 = unit_vector(n1 - n_center)
+    v2 = unit_vector(n2 - n_center)
     return unit_vector(v1 + v2)
 
 
 def main():
     df = load_coordinates("bohr_coordinates.txt")
 
-    ni_atoms = ["N4", "N3", "N2"]
     timesteps = df["timestep"].unique()
     results = []
 
     for ts in timesteps:
         frame = df[df["timestep"] == ts]
-        ni_df = frame[frame["atomname"].isin(ni_atoms)]
 
         water_molecules = []
         for resid, group in frame.groupby("resid"):
@@ -61,29 +59,31 @@ def main():
             except IndexError:
                 continue
 
-        for _, ni_row in ni_df.iterrows():
-            ni_pos = np.array([ni_row["x"], ni_row["y"], ni_row["z"]])
-            ei = compute_electric_field(ni_pos, water_molecules)
+        try:
+            n2 = frame[frame["atomname"] == "N2"][['x', 'y', 'z']].values[0]
+            n3 = frame[frame["atomname"] == "N3"][['x', 'y', 'z']].values[0]
+            n4 = frame[frame["atomname"] == "N4"][['x', 'y', 'z']].values[0]
+        except IndexError:
+            continue
 
-            if ni_row["atomname"] == "N2":
-                try:
-                    n3 = frame[frame["atomname"] == "N3"][['x', 'y', 'z']].values[0]
-                    n4 = frame[frame["atomname"] == "N4"][['x', 'y', 'z']].values[0]
-                    rb = compute_bisector(ni_pos, n3, n4)
-                    e_out = np.dot(rb, ei)
-                except IndexError:
-                    e_out = np.nan
-            else:
-                e_out = np.nan
+        ei_n2 = compute_electric_field(n2, water_molecules)
+        ei_n3 = compute_electric_field(n3, water_molecules)
+        ei_n4 = compute_electric_field(n4, water_molecules)
 
-            results.append({
-                "timestep": ts,
-                "atom": ni_row["atomname"],
-                "Ei_x": ei[0],
-                "Ei_y": ei[1],
-                "Ei_z": ei[2],
-                "E_out": e_out
-            })
+        bisector_n2 = compute_bisector(n2, n3, n4)
+        bisector_n3 = compute_bisector(n3, n2, n4)
+        bisector_n4 = compute_bisector(n4, n2, n3)
+
+        proj_n2 = np.dot(bisector_n2, ei_n2)
+        proj_n3 = np.dot(bisector_n3, ei_n3)
+        proj_n4 = np.dot(bisector_n4, ei_n4)
+
+        results.append({
+            "timestep": ts,
+            "N2": proj_n2,
+            "N3": proj_n3,
+            "N4": proj_n4
+        })
 
     df_out = pd.DataFrame(results)
     df_out.to_csv("electric_field_output.txt", index=False, sep='\t')
