@@ -1,16 +1,22 @@
+# File: compute_electric_field.py
+
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from MDAnalysis.analysis import distances
 
-DISTANCE_CUTOFF = 37.794519772  # 20Å in Bohr
-O_CHARGE = -1.04
-HW_CHARGE = 0.52
+# Constants
+DISTANCE_CUTOFF = 100.0  # Increase cutoff for debugging (Bohr units)
+O_CHARGE = -0.834
+HW_CHARGE = 0.417
+ANGSTROM_TO_BOHR = 1.889726
 
 
 def load_coordinates(file_path):
     cols = ["resid", "resname", "atomname", "atom", "timestep", "x", "y", "z"]
     df = pd.read_csv(file_path, delim_whitespace=True, names=cols, skiprows=1)
+    # Assume coordinates are in Angstrom -> convert to Bohr
+    for axis in ['x', 'y', 'z']:
+        df[axis] *= ANGSTROM_TO_BOHR
     return df
 
 
@@ -21,10 +27,10 @@ def unit_vector(v):
 
 def compute_electric_field(ni_pos, water_molecules):
     ei_vector = np.zeros(3)
-    for ow, mw, hw1, hw2 in water_molecules:
+    for ow, hw1, hw2 in water_molecules:
         dist_ow = np.linalg.norm(ow - ni_pos)
         if dist_ow < DISTANCE_CUTOFF:
-            for pos, charge in zip([mw, hw1, hw2], [O_CHARGE, HW_CHARGE, HW_CHARGE]):
+            for pos, charge in zip([ow, hw1, hw2], [O_CHARGE, HW_CHARGE, HW_CHARGE]):
                 r_vec = pos - ni_pos
                 r = np.linalg.norm(r_vec)
                 if r != 0:
@@ -51,24 +57,29 @@ def main():
         water_molecules = []
         for resid, group in frame.groupby("resid"):
             try:
-                ow = group[group["atomname"] == "OW"][['x', 'y', 'z']].values[0]
-                mw = group[group["atomname"] == "MW"][['x', 'y', 'z']].values[0]
-                hw1 = group[group["atomname"] == "HW1"][['x', 'y', 'z']].values[0]
-                hw2 = group[group["atomname"] == "HW2"][['x', 'y', 'z']].values[0]
-                water_molecules.append((ow, mw, hw1, hw2))
+                ow = group[group["atomname"] == "OH2"][['x', 'y', 'z']].values[0]
+                hw1 = group[group["atomname"] == "H1"][['x', 'y', 'z']].values[0]
+                hw2 = group[group["atomname"] == "H2"][['x', 'y', 'z']].values[0]
+                water_molecules.append((ow, hw1, hw2))
             except IndexError:
                 continue
 
+        print(f"Timestep {ts}: Collected {len(water_molecules)} waters")
+
         try:
-            n2 = frame[frame["atomname"] == "N2"][['x', 'y', 'z']].values[0]
-            n3 = frame[frame["atomname"] == "N3"][['x', 'y', 'z']].values[0]
-            n4 = frame[frame["atomname"] == "N4"][['x', 'y', 'z']].values[0]
+            n2 = frame[frame["atomname"] == "NE"][['x', 'y', 'z']].values[0]
+            n3 = frame[frame["atomname"] == "NH1"][['x', 'y', 'z']].values[0]
+            n4 = frame[frame["atomname"] == "NH2"][['x', 'y', 'z']].values[0]
         except IndexError:
             continue
 
         ei_n2 = compute_electric_field(n2, water_molecules)
         ei_n3 = compute_electric_field(n3, water_molecules)
         ei_n4 = compute_electric_field(n4, water_molecules)
+
+        print(f"E-field at NE: {ei_n2}")
+        print(f"E-field at NH1: {ei_n3}")
+        print(f"E-field at NH2: {ei_n4}")
 
         bisector_n2 = compute_bisector(n2, n3, n4)
         bisector_n3 = compute_bisector(n3, n2, n4)
@@ -87,7 +98,6 @@ def main():
 
     df_out = pd.DataFrame(results)
     df_out.to_csv("electric_field_output.txt", index=False, sep='\t')
-
 
 
 if __name__ == "__main__":
