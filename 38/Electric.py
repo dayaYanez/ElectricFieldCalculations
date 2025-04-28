@@ -14,9 +14,6 @@ ANGSTROM_TO_BOHR = 1.889726
 def load_coordinates(file_path):
     cols = ["resid", "resname", "atomname", "atom", "timestep", "x", "y", "z"]
     df = pd.read_csv(file_path, delim_whitespace=True, names=cols, skiprows=1)
-    # Assume coordinates are in Angstrom -> convert to Bohr
-    for axis in ['x', 'y', 'z']:
-        df[axis] *= ANGSTROM_TO_BOHR
     return df
 
 
