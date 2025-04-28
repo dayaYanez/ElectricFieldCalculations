@@ -1,0 +1,38 @@
+Timestep 0: Collected 658 waters
+E-field at NE: [-0.00336418 -0.00216909 -0.00131348]
+E-field at NH1: [-0.00212797 -0.00127914 -0.00144314]
+E-field at NH2: [-2.45782014e-06 -3.14470993e-03 -7.62393303e-05]
+Timestep 1: Collected 658 waters
+E-field at NE: [-0.00279995 -0.00110115 -0.00022919]
+E-field at NH1: [-1.77121327e-03 -1.86834048e-03 -1.91375371e-05]
+E-field at NH2: [ 9.15434974e-05 -2.64981172e-03  1.06959960e-04]
+Timestep 2: Collected 658 waters
+E-field at NE: [-0.00275413 -0.00102562 -0.00026466]
+E-field at NH1: [-0.00176514 -0.00222308 -0.00044053]
+E-field at NH2: [-0.00077392 -0.00319697 -0.00045117]
+Timestep 3: Collected 658 waters
+E-field at NE: [-0.00344152 -0.00118219 -0.00036797]
+E-field at NH1: [-0.00169017 -0.00273036 -0.00052564]
+E-field at NH2: [ 0.00018255 -0.00287346  0.0003469 ]
+Timestep 4: Collected 658 waters
+E-field at NE: [-0.00249762 -0.00138844 -0.00025237]
+E-field at NH1: [-0.00121127 -0.00258867  0.00012849]
+E-field at NH2: [-0.00034337 -0.0023422   0.00069925]
+Timestep 5: Collected 658 waters
+E-field at NE: [-0.00299417 -0.00125419  0.0008281 ]
+E-field at NH1: [-0.0016841  -0.00275652  0.0003122 ]
+E-field at NH2: [-0.00112226 -0.00243054  0.00116284]
+Timestep 6: Collected 658 waters
+E-field at NE: [-0.00243532 -0.00192519  0.00037438]
+E-field at NH1: [-0.00097674 -0.00328021 -0.00021782]
+E-field at NH2: [ 0.00076782 -0.00273247  0.00015606]
+Timestep 7: Collected 658 waters
+E-field at NE: [-0.00300199 -0.00172475 -0.00037307]
+E-field at NH1: [-0.00115199 -0.00408059  0.00011805]
+E-field at NH2: [-0.00089814 -0.00225487  0.00091682]
+Timestep 8: Collected 658 waters
+E-field at NE: [-0.00250063 -0.00150542  0.00039205]
+E-field at NH1: [-0.00044897 -0.00369162  0.00075585]
+E-field at NH2: [-0.00071681 -0.00143638  0.00255439]
+Timestep 9: Collected 658 waters
+E-field at NE: [-0.00274215 -0.00160955  0.00066293]
