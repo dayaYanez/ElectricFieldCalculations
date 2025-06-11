@@ -49,7 +49,7 @@ output_df = pd.DataFrame(results)
 output_df.to_csv("results.txt", sep='\t', index=False)
 print(output_df)
 
-# Plot phy vs E (scatter only)
+# Plot phy vs E 
 plt.figure()
 plt.scatter(output_df['phy'], output_df['E'])
 plt.xlabel('phy')
@@ -59,7 +59,7 @@ plt.grid(True)
 plt.savefig("phy_vs_E.png")
 plt.show()
 
-# Plot phy vs Dipole_x (scatter only)
+# Plot phy vs Dipole_x
 plt.figure()
 plt.scatter(output_df['phy'], output_df['Dipole_x'])
 plt.xlabel('phy')
